@@ -113,11 +113,11 @@ $$
    - Let's say the random order of features is **(X₂ → X₁ → X₃)**.  
 
 4. **Construct two new instances:**  
-   - **Without \(X_1\)** (Using $z$'s value for \(X_1\)):  
+   - **Without $X_1$** (Using $z$'s value for $X_1$):  
      $$
      x_{-1} = (7, 3, 2)
      $$
-   - **With \(X_1\)** (Keeping \(X_1\) from \(x\), others from \(z\)):  
+   - **With $X_1$** (Keeping $X_1$ from $x$, others from $z$):  
      $$
      x_{+1} = (7, 5, 2)
      $$
@@ -127,11 +127,11 @@ $$
      $$
      f(X) = 10 \times X_1 + 5 \times X_2 - 3 \times X_3
      $$
-   - **Without \(X_1\):**  
+   - **Without $X_1$:**  
      $$
      f(x_{-1}) = (10 \times 3) + (5 \times 7) - (3 \times 2) = 30 + 35 - 6 = 59
      $$
-   - **With \(X_1\):**  
+   - **With $X_1$:**  
      $$
      f(x_{+1}) = (10 \times 5) + (5 \times 7) - (3 \times 2) = 50 + 35 - 6 = 79
      $$
@@ -141,7 +141,7 @@ $$
    \phi_1^m = f(x_{+1}) - f(x_{-1}) = 79 - 59 = 20
    $$
 
-7. **Repeat steps 2-6 for \(M\) iterations**  
+7. **Repeat steps 2-6 for $M$ iterations**  
    - If we repeat this multiple times with different instances, we average the SHAP values.
 
 8. **Compute the final SHAP value as the average contribution:**  
