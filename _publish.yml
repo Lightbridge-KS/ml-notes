@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: fda44dd5-402a-4629-bd9e-cb74c8e72883
+      url: https://ml-notes-lightbridge.netlify.app
