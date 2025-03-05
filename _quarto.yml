@@ -9,6 +9,9 @@ book:
   site-url: https://ml-notes-lightbridge.netlify.app
   chapters:
     - index.qmd
+    - part: Model Explainability
+      chapters: 
+        - "content/explain/shap-01-intro.qmd"
 
 bibliography: references.bib
 

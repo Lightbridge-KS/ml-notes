@@ -1,0 +1,171 @@
+# Shapley Value (Basic)
+
+
+## Basic Concept
+
+
+### Simple Example of SHAP in Machine Learning
+
+Imagine a machine learning model that predicts whether a student will pass an exam (Yes/No) based on three factors:
+
+1. **Study Hours**
+2. **Sleep Hours**
+3. **Number of Distractions (e.g., phone, TV, etc.)**
+
+The model's **baseline prediction** (average chance of passing) is **50%**.
+
+Now, for a specific student, the model predicts **80% probability of passing**.  
+SHAP values explain how each feature contributed to this prediction:
+
+| Feature | SHAP Value | Interpretation |
+|---------|-----------|---------------|
+| **Study Hours** (+5 hours) | **+20%** | More study time increases passing probability. |
+| **Sleep Hours** (+8 hours) | **+10%** | Enough sleep improves performance. |
+| **Distractions** (Many distractions) | **-10%** | More distractions reduce the passing probability. |
+
+### SHAP Calculation
+
+- Baseline probability: **50%**
+- SHAP contributions:  
+  - **Study Hours (+20%)**  
+  - **Sleep Hours (+10%)**  
+  - **Distractions (-10%)**
+- Final prediction: **50% + 20% + 10% - 10% = 80%**
+
+### Key Takeaway
+
+- **Positive SHAP values** push the prediction **higher** (increase passing probability).
+- **Negative SHAP values** push the prediction **lower** (decrease passing probability).
+- The sum of SHAP values **explains why the model made its prediction**.
+
+This helps interpret the **real impact of each feature on the model’s decision** in a clear, human-readable way.
+
+
+## Deep Dive into SHAP
+
+### Approximate Shapley Estimation for Single Feature Value
+
+- **Output**: Shapley value for the value of the j-th feature
+- **Required**: Number of iterations $M$, instance of interest $x$, feature index $j$, data matrix $X$, and machine learning model $f$
+
+  - For all $m = 1, \dots, M$:
+    - Draw random instance $z$ from the data matrix $X$
+    - Choose a random permutation $o$ of the feature values
+    - Order instance $x$:  
+      $$
+      x_o = (x_{(1)}, \dots, x_{(j)}, \dots, x_{(p)})
+      $$
+    - Order instance $z$:  
+      $$
+      z_o = (z_{(1)}, \dots, z_{(j)}, \dots, z_{(p)})
+      $$
+    - Construct two new instances:
+      - **With $j$**:  
+        $$
+        x_{+j} = (x_{(1)}, \dots, x_{(j-1)}, x_{(j)}, z_{(j+1)}, \dots, z_{(p)})
+        $$
+      - **Without $j$**:  
+        $$
+        x_{-j} = (x_{(1)}, \dots, x_{(j-1)}, z_{(j)}, z_{(j+1)}, \dots, z_{(p)})
+        $$
+    - Compute marginal contribution:  
+      $$
+      \phi_j^m = \hat{f}(x_{+j}) - \hat{f}(x_{-j})
+      $$
+
+- Compute Shapley value as the average:  
+  $$
+  \phi_j(x) = \frac{1}{M} \sum_{m=1}^{M} \phi_j^m
+  $$
+
+
+
+Let's go through a **step-by-step** example of SHAP estimation based on the process in the image.  
+
+---
+
+### Example Dataset
+
+We have a simple dataset with 3 features and 4 data points.  
+
+| Instance | Study Hours (X₁) | Sleep Hours (X₂) | Distractions (X₃) | Exam Score (f(x)) |
+|----------|---------------|-------------|--------------|--------------|
+| A (x)  | 5             | 7           | 2            | ?            |
+| B (z)  | 3             | 6           | 4            |  ?           |
+| C       | 6             | 5           | 3            |  ?           |
+| D       | 4             | 8           | 1            |  ?           |
+
+A simple model predicts exam scores as:  
+$$
+f(X) = 10 \times X_1 + 5 \times X_2 - 3 \times X_3
+$$
+---
+
+### SHAP Estimation for Feature $X_1$ (Study Hours)
+
+1. **Choose the instance of interest**  
+   - Let's compute SHAP for **Study Hours (X₁)** for **Instance A** (5 Study Hours, 7 Sleep Hours, 2 Distractions).  
+
+2. **Draw a random instance $z$ from data matrix $X$**  
+   - Randomly choose **Instance B** as $z$ (3 Study Hours, 6 Sleep Hours, 4 Distractions).  
+
+3. **Choose a random permutation $o$ of feature order**  
+   - Let's say the random order of features is **(X₂ → X₁ → X₃)**.  
+
+4. **Construct two new instances:**  
+   - **Without \(X_1\)** (Using $z$'s value for \(X_1\)):  
+     $$
+     x_{-1} = (7, 3, 2)
+     $$
+   - **With \(X_1\)** (Keeping \(X_1\) from \(x\), others from \(z\)):  
+     $$
+     x_{+1} = (7, 5, 2)
+     $$
+
+5. Compute predictions for these instances:
+   - Using the formula:  
+     $$
+     f(X) = 10 \times X_1 + 5 \times X_2 - 3 \times X_3
+     $$
+   - **Without \(X_1\):**  
+     $$
+     f(x_{-1}) = (10 \times 3) + (5 \times 7) - (3 \times 2) = 30 + 35 - 6 = 59
+     $$
+   - **With \(X_1\):**  
+     $$
+     f(x_{+1}) = (10 \times 5) + (5 \times 7) - (3 \times 2) = 50 + 35 - 6 = 79
+     $$
+
+6. **Compute marginal contribution**  
+   $$
+   \phi_1^m = f(x_{+1}) - f(x_{-1}) = 79 - 59 = 20
+   $$
+
+7. **Repeat steps 2-6 for \(M\) iterations**  
+   - If we repeat this multiple times with different instances, we average the SHAP values.
+
+8. **Compute the final SHAP value as the average contribution:**  
+   $$
+   \phi_1 (x) = \frac{1}{M} \sum_{m=1}^{M} \phi_1^m
+   $$
+   - If we performed **5 iterations**, and the contributions were: **20, 22, 18, 21, 19**,  
+   - The final SHAP value is:  
+     $$
+     \phi_1(x) = \frac{20 + 22 + 18 + 21 + 19}{5} = 20
+     $$
+
+---
+
+### Final SHAP Values for This Instance
+
+| Feature | SHAP Value |
+|---------|------------|
+| Study Hours (X₁) | +20 |
+| Sleep Hours (X₂) | +8 |
+| Distractions (X₃) | -5 |
+
+- **Study Hours (X₁) contributed the most** to increasing the exam score.  
+- **Sleep Hours (X₂) also helped but less than X₁**.  
+- **Distractions (X₃) decreased the score**, as expected.  
+
+This is how SHAP values **fairly distribute the impact of each feature on the model’s prediction**.
