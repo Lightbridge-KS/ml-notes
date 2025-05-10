@@ -12,6 +12,9 @@ book:
     - part: Model Explainability
       chapters: 
         - "content/explain/shap-01-intro.qmd"
+    - part: Explore
+      chapters: 
+        - "content/ml-other-lang.qmd"
 
 bibliography: references.bib
 
